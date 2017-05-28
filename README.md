@@ -10,3 +10,4 @@ Pyscript is written in Python language without any GUI interface and so you can 
 You can also archive all sh files in a flat file (scriptarch.txt) to avoid a unintentional delete.
 Next release step: manage an archive of cifs mounts.
 Sorry, my english is bad but I wanted to share this simple code with more people than possible.
+[screenshot](https://github.com/attibo/pyScript/blob/master/pyScript_screenshot.png?raw=true)
