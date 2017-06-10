@@ -1,5 +1,6 @@
 # pyScript
-Now it's called Shpy
+Now it's called Shpy !
+
 Simple tool written in in Python language to manage Linux sh script (for example several backup LAN script)
 only for Linux. Needs Vim editor installed.
 Someone need to manage several GNU Linu sh scripts (for example to perform some backups over the LAN network).
