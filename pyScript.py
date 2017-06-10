@@ -10,6 +10,7 @@ import commands
 import string
 import subprocess
 import datetime
+import getpass
 
 # funzione writelog(operazione,logfile,dt,ev)
 # scrive una stringa in un file di log
@@ -85,12 +86,16 @@ def getComment(nomefile):
 # showFile() Visualizza l'elenco dei files script in archivio 
 # catalogo = nome del file archivio degli script 
 # ritorna il dizionario con i dati degli script
-# es. dicScript[1] --> script1.sh ecc.
+# es. dizScript[1] --> script1.sh ecc.
+# oppure: dizMount[1] =  1 - Windows anagrafe,"Attilio Bongiorni","//192.168.1.26/Users/Attilio Bongiorni/",/mnt/pyback
 # Attilio Bongiorni - maggio 2017
+# giugno 2017:
+# nuova versione, gestisce le righe commentate e crea i cataloghi se non ci sono
 
 def showFiles(catalogo):
 
 	n = 0
+	now=datetime.datetime.now()
 	#creiamo un dizionario per gli script
 	dicScript = dict()
 	if os.path.exists(catalogo):
@@ -102,16 +107,30 @@ def showFiles(catalogo):
 			vr = 0
 		else:
 			for script in archivio :
-				n=n+1
-				print repr(n) + " - " + script.rstrip()
-				dicScript[n] = script.rstrip()
-				vr = 1
+				if not script.startswith("#"):
+					n=n+1
+					print repr(n) + " - " + script.rstrip()
+					dicScript[n] = script.rstrip()
+					vr = 1
 	else:
-		print "File catalogo inesistente! \n"
+		print "File catalogo inesistente, viene creato! \n"
+		handle=open(catalogo,"w")
+		if catalogo=="catalogo.txt":
+			handle.write("#file catalogo creato il "+ now.strftime("%Y-%m-%d %H:%M")+"\n")
+			handle.close()
+		elif catalogo=="cifsarc.txt":
+			handle.write("# file cifsarc.txt creato il: "+ now.strftime("%Y-%m-%d %H:%M")+"\n")
+			handle.write("# struttura dell'archivio di mountpoint cifs:\n")
+			handle.write("# descrizione,username,percorso_di_rete,punto di mount\n")
+			handle.write("# esempio: descrizione,\"Username Windows\",\"//192.168.1.100/Users/Nome Utente Windows/\",/mnt/mountpoint\n")
+			handle.write("# la password viene richiesta al momento del mount<br>")
+			handle.close()
+		else:
+			handle.write("#file catalogo creato il "+ now.strftime("%Y-%m-%d %H:%M")+"\n")
+			handle.close()
 		vr=0
 	
-	return dicScript
-	
+	return dicScript	
 #######################################################################
 # MJoin
 # Copyright (C) 2008  Simone Cansella (aka checkm)
@@ -213,6 +232,38 @@ def archivia(nomescript, nomearchivio):
 		
 	return vr
 
+
+# shpymenu(listaMount)
+# visualizza il menu
+# il parametro listaMount è una lista python dei punti di mount che 
+# risultano montati in quel momento, così vengono visualizzati
+# progetto di utility per la gestione degli script di backup (.sh)
+# Attilio Bongiorni - giugno 2017
+#--------------------------------
+def shpymenu(listaMount):
+	print color("<yellow>Shpy 1.5 - Attilio Bongiorni - 2017</yellow>")
+	print color("<yellow>--- COMANDI ---</yellow>")
+	if len(mntList)>0:
+		for dischi in listaMount:
+			print color("<blue>(!) "+dischi+"</blue> ")
+	print color("<yellow>agg</yellow> = refresh elenco files in catalogo")
+	print color("<yellow>rem [numero] </yellow> = vedi i commenti di uno script")
+	print color("<yellow>add [file e percorso completo]</yellow>  = aggiunge uno script a quelli già gestiti")
+	print color("<yellow>sto [numeri separati da virgole] </yellow> = es.sto 1,2,5 archivia gli script n.1,2 e 5")
+	print color("<yellow>edi</yellow> = edit manuale del catalogo degli script")
+	print color("<yellow>eds [numero]</yellow> = modifica uno script in catalogo" )
+	print color("<yellow>exe [numeri separati da virgole] </yellow> = es. exe 1,2,5 esegue gli script n.1,2 e 5")
+	print color("<yellow>log </yellow> = visualizza il log di sistema")
+	print color("<yellow>vih </yellow> = principali comandi dell'editor Vim")
+	print color("<yellow>mnt </yellow> = elenco dei mount cifs")
+	print color("<yellow>mnn [numero]</yellow> monta il disco cifs n.")
+	print color("<yellow>unn [numero]</yellow> smonta il disco cifs n.")
+	print color("<yellow>mne</yellow> edit manuale catalogo dei mount")
+	print color("<yellow>men</yellow> visualizza il menu")
+	print color("<yellow>end</yellow> = uscita")
+	print "\n" 
+
+	return
 	
 #=====================================	
 #-------fine funzioni-----------------
@@ -223,21 +274,10 @@ print "---------------------"
 dizScript=showFiles("catalogo.txt")
 print "---------------------"
 comando =""
-	
+mntList=[]
 while comando <> "end":
-	print color("<yellow>PITONI SCRITTI 1.3 - Attilio Bongiorni - 2017</yellow>")
-	print color("<yellow>--- COMANDI ---</yellow>")
-	print color("<yellow>agg</yellow> = refresh elenco files in catalogo")
-	print color("<yellow>rem [numero] </yellow> = vedi i commenti di uno script")
-	print color("<yellow>add [file e percorso completo]</yellow>  = aggiunge uno script a quelli già gestiti")
-	print color("<yellow>sto [numeri separati da virgole] </yellow> = es.sto 1,2,5 archivia gli script n.1,2 e 5")
-	print color("<yellow>edi</yellow> = edit manuale del catalogo degli script")
-	print color("<yellow>eds [numero]</yellow> = modifica uno script in catalogo" )
-	print color("<yellow>exe [numeri separati da virgole] </yellow> = es. exe 1,2,5 esegue gli script n.1,2 e 5")
-	print color("<yellow>log </yellow> = visualizza il log di sistema")
-	print color("<yellow>vih </yellow> = principali comandi dell'editor Vim")
-	print color("<yellow>end</yellow> = uscita")
-	print "\n" 
+	# visualizzazione menu!
+	shpymenu(mntList)
 	# nota: dizScript è il dizionario generato dal showfiles()
 	# mentre regoList è la stringa di comando inserito dall'operatore
 	regolare = nodoppispazi(comando)
@@ -318,7 +358,7 @@ while comando <> "end":
 							evidenza = 0
 						writelog("error code="+repr(edit),"logpyback.log",1,evidenza)
 					else: #path exists
-						writelog("File script: "+nomescript+" inesistente","",1,1)
+						writelog("File script: "+nomeScript+" inesistente","",1,1)
 						print color("<red>Il file non esiste, è stato spostato o rimosso e il catalogo non è stato aggiornato</red>")
 					# fine ciclo esecuzione multipla	
  				# blocco try except - fine  					
@@ -369,8 +409,92 @@ while comando <> "end":
 			edit = subprocess.call(edit_call)
 		else:
 			print("Il file vimhelp.txt non è presente")
-			
 	
+	elif regolare.startswith("mnt"):
+		showFiles("cifsarc.txt")
+		
+	elif regolare.startswith("mnn"):
+		dizMount=showFiles("cifsarc.txt")
+		
+		# len(regolist)> 1 vuol dire che ha dato anche un numero e non solo il comando
+		if len(regoList)>1:
+			#recupera i dati del mount dal dizionario ritornato da showfiles()
+			#regolist è una lista che contiene comando e parametro es. rem 1
+			# pro memoria struttura del file cifsarc.txt:
+			# descrizione,username,percorso_di_rete,punto di mount
+			
+			# controllo se ha inserito un valore out of range
+			if int(regoList[1])<=len(dizMount): 			# parametro comando out of range ?
+				mountPack=dizMount[int(regoList[1])]
+				mount = mountPack.split(",")
+				cifsDesc=mount[0]
+				cifsUser=mount[1]
+				cifsPath=mount[2]
+				cifsMoun=mount[3]
+				pwdMount=getpass.getpass("Password di rete: ")
+				# esempio di un cifs mount:
+				# sudo mount -t cifs -o username="Attilio Bongiorni",password=password "//192.168.2.26/Users/Attilio Bongiorni/" /mnt/pyback
+				# NOTA: non è necessario mettere le virgolette nella concatenazione della stringa
+				# perchè python le mette automaticamente non riesco a capire come faccia perchè nel caso di "password=+"pwdMount non la mette
+				# mentre negli altri casi dove servono sì
+				comando_mount = "sudo mount -t cifs -o username="+ cifsUser+",password="+pwdMount+" "+cifsPath +" " +cifsMoun
+				
+				# riattivare la linea seguente per un debug del comando
+				# print("comando di mount generato: "+comando_mount)
+				
+				writelog("mount "+ cifsDesc,"logpyback.log",1,0)
+				edit = subprocess.call(comando_mount, shell=True)
+				#se c'è stato un errore mette l'evidenza nel log (!)
+				if edit>0:
+					evidenza = 1
+					writelog("error code="+repr(edit),"logpyback.log",1,evidenza)
+				else:
+					mntList.append(cifsMoun)
+					evidenza = 0
+			else: 												# parametro comando out of range
+				print color("<red>Numero mount inesistente!</red>")
+
+	elif regolare.startswith("umn"):	
+		dizMount=showFiles("cifsarc.txt")
+		
+		# len(regolist)> 1 vuol dire che ha dato anche un numero e non solo il comando
+		if len(regoList)>1:
+			#recupera i dati del mount dal dizionario ritornato da showfiles()
+			#regolist è una lista che contiene comando e parametro es. rem 1
+			# pro memoria struttura del file cifsarc.txt:
+			# descrizione,username,percorso_di_rete,punto di mount
+			
+			# controllo se ha inserito un valore out of range
+			if int(regoList[1])<=len(dizMount): 			# parametro comando out of range ?
+				mountPack=dizMount[int(regoList[1])]
+				mount = mountPack.split(",")
+				cifsDesc=mount[0]
+				cifsUser=mount[1]
+				cifsPath=mount[2]
+				cifsMoun=mount[3]
+				comando_umount = "sudo umount "+cifsMoun
+				writelog("umount "+ cifsDesc,"logpyback.log",1,0)
+				edit = subprocess.call(comando_umount, shell=True)
+				#se c'è stato un errore mette l'evidenza nel log (!)
+				if edit>0:
+					evidenza = 1
+					writelog("error code="+repr(edit),"logpyback.log",1,evidenza)
+				else:
+					mntList.append(cifsMoun)
+					evidenza = 0
+			else: 												# parametro comando out of range
+				print color("<red>Numero mount inesistente!</red>")
+		
+	elif regolare.startswith("mne"):
+		writelog("Inizio edit manuale catalogo punti di mount", "logpyback.log",1,0)
+		subprocess.call(['vim cifsarc.txt'], shell=True)
+		writelog("Fine edit manuale catalogo punti di mount", "logpyback.log",1,0)
+		
+	elif regolare.startswith("men"):
+		shpymenu(mntList)
+
+	
+	#--------input------------
 	comando = raw_input("comando ---> ")
 	
 	
