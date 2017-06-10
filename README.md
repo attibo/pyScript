@@ -1,4 +1,5 @@
 # pyScript
+Now it's called Shpy
 Simple tool written in in Python language to manage Linux sh script (for example several backup LAN script)
 only for Linux. Needs Vim editor installed.
 Someone need to manage several GNU Linu sh scripts (for example to perform some backups over the LAN network).
@@ -10,4 +11,4 @@ Pyscript is written in Python language without any GUI interface and so you can 
 You can also archive all sh files in a flat file (scriptarch.txt) to avoid a unintentional delete.
 Next release step: manage an archive of cifs mounts.
 Sorry, my english is bad but I wanted to share this simple code with more people than possible.
-[screenshot](https://github.com/attibo/pyScript/blob/master/pyScript_screenshot.png?raw=true)
+(https://github.com/attibo/pyScript/blob/master/pyScript_screenshot.png?raw=true)
