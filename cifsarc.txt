@@ -1,0 +1,5 @@
+# file cifsarc.txt creato il: 2017-05-25 15:51
+# struttura dell'archivio di mountpoint cifs
+# descrizione,username,percorso_di_rete,punto di mount
+# esempio: descrizione,"User","//192.168.1.100/Users/Nome Cognome/",/mnt/mountpoint
+# la password viene richiesta al momento del mount
