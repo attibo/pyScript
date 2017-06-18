@@ -241,7 +241,7 @@ def archivia(nomescript, nomearchivio):
 # Attilio Bongiorni - giugno 2017
 #--------------------------------
 def shpymenu(listaMount):
-	print color("<yellow>Shpy 1.5 - Attilio Bongiorni - 2017</yellow>")
+	print color("<yellow>Shpy 1.7 - Attilio Bongiorni - 2017</yellow>")
 	print color("<yellow>--- COMANDI ---</yellow>")
 	if len(mntList)>0:
 		for dischi in listaMount:
@@ -257,7 +257,7 @@ def shpymenu(listaMount):
 	print color("<yellow>vih </yellow> = principali comandi dell'editor Vim")
 	print color("<yellow>mnt </yellow> = elenco dei mount cifs")
 	print color("<yellow>mnn [numero]</yellow> monta il disco cifs n.")
-	print color("<yellow>unn [numero]</yellow> smonta il disco cifs n.")
+	print color("<yellow>umn [numero]</yellow> smonta il disco cifs n.")
 	print color("<yellow>mne</yellow> edit manuale catalogo dei mount")
 	print color("<yellow>men</yellow> visualizza il menu")
 	print color("<yellow>end</yellow> = uscita")
@@ -277,6 +277,7 @@ comando =""
 mntList=[]
 while comando <> "end":
 	# visualizzazione menu!
+	
 	shpymenu(mntList)
 	# nota: dizScript è il dizionario generato dal showfiles()
 	# mentre regoList è la stringa di comando inserito dall'operatore
@@ -480,7 +481,8 @@ while comando <> "end":
 					evidenza = 1
 					writelog("error code="+repr(edit),"logpyback.log",1,evidenza)
 				else:
-					mntList.append(cifsMoun)
+					cancMount = mntList.index(cifsMoun)
+					del mntList[cancMount]
 					evidenza = 0
 			else: 												# parametro comando out of range
 				print color("<red>Numero mount inesistente!</red>")
@@ -497,6 +499,8 @@ while comando <> "end":
 	#--------input------------
 	comando = raw_input("comando ---> ")
 	
+             
+
 	
 	
 	
